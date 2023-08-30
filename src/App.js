@@ -1,23 +1,91 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react";
+import ReactDOM from "react-dom";
+
+import "./styles.css";
 
 function App() {
+  // React States
+  // errorMessages: Store an object with the name of the field and the associated error message.
+
+  const [errorMessages, setErrorMessages] = useState({});
+  // isSubmitted: boolean value to indicate if the form is successfully submitted or not.
+  const [isSubmitted, setIsSubmitted] = useState(false);
+
+  // User Login info
+  const database = [
+    {
+      username: "user1",
+      password: "pass1"
+    },
+    {
+      username: "user2",
+      password: "pass2"
+    }
+  ];
+
+  const errors = {
+    uname: "invalid username",
+    pass: "invalid password"
+  };
+
+  const handleSubmit = (event) => {
+    //Prevent page reload
+    event.preventDefault();
+//form objects in the document
+    var { uname, pass } = document.forms[0];
+
+    // Find user login info
+    const userData = database.find((user) => user.username === uname.value);
+
+    // Compare user info
+    if (userData) {
+      if (userData.password !== pass.value) {
+        // Invalid password
+        setErrorMessages({ name: "pass", message: errors.pass });
+      } else {
+        setIsSubmitted(true);
+      }
+    } else {
+      // Username not found
+      setErrorMessages({ name: "uname", message: errors.uname });
+    }
+  };
+
+  // Generate JSX code for error message
+  // The renderErrorMessage function returns JSX code for displaying the error message associated
+  //  with the field name.
+  const renderErrorMessage = (name) =>
+    name === errorMessages.name && (
+      <div className="error">{errorMessages.message}</div>
+    );
+
+  // JSX code for login form
+  const renderForm = (
+    <div className="form">
+      <form onSubmit={handleSubmit}>
+        <div className="input-container">
+          <label>Username </label>
+          <input type="text" name="uname" required />
+          {renderErrorMessage("uname")}
+        </div>
+        <div className="input-container">
+          <label>Password </label>
+          <input type="password" name="pass" required />
+          {renderErrorMessage("pass")}
+        </div>
+        <div className="button-container">
+          <input type="submit" />
+        </div>
+      </form>
+    </div>
+  );
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="app">
+      <div className="login-form">
+        <div className="title">Sign In</div>
+        {isSubmitted ? <div>User is successfully logged in</div> : renderForm}
+      </div>
     </div>
   );
 }
